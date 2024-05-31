@@ -3,9 +3,14 @@ import { View, StyleSheet, ScrollView } from "react-native";
 
 // import { Button } from "../../components/Buttons";
 import { faClock, faPen, faTrash, faUser, faX } from "@fortawesome/free-solid-svg-icons";
-import { Avatar, Button, Card, Dialog, Portal, PaperProvider, Text, TouchableRipple, List, ActivityIndicator, Searchbar  } from 'react-native-paper';
+import { Avatar, Button, Card, Dialog, Portal, PaperProvider, Text, TouchableRipple, List, ActivityIndicator, Searchbar, Modal, FAB, TextInput, Menu } from 'react-native-paper';
 // import NotaFiscal from "../../services/sqlite/NFE";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { height, width } from "@fortawesome/free-brands-svg-icons/fa42Group";
+import { FormRegister } from "../../components/FormRegister";
+import DatePicker from "@react-native-community/datetimepicker";
+import Cliente from "../../services/sqlite/Cliente";
+
 
 export default function Home({ onClose = () => {} }) {
 
@@ -51,18 +56,110 @@ export default function Home({ onClose = () => {} }) {
     const [searchQuery, setSearchQuery] = React.useState('');
 
 
+    const modalChange = () => setVisible(!visible);
+    const containerStyle = {backgroundColor: 'white', marginHorizontal: "10%", width: "80%", height:"80%", borderRadius: 10};
+
+    const [date, setDate] = useState(new Date())
+    const [openDate, setOpenDate] = useState()
+    const [dataPickerDay2, setDataPickerDay2] = useState(false)
+    const [dataPickerDay, setDataPickerDay] = useState(false)
+
+    const onChangeDate = (e, selectDate) => {
+        setDate(selectDate)
+        console.log(date)
+        setDataPickerDay(false)
+        setDataPickerDay2(false)
+    }
+
+    const [clientes, setClientes] = useState()
+    const [clientesBuscados, setClientesBuscados] = useState(false)
+
+    useEffect(() => {
+        buscaClientes()
+    }, [])
+
+    const buscaClientes = async () => {
+        const busca = await Cliente.all();
+        setClientes(busca);
+        setClientesBuscados(true);
+    }
+
+    const [visibleMenu, setVisibleMenu] = useState()
+
+    const changeMenu = () => {setVisibleMenu(!visibleMenu)}
+
     return(
 
     <PaperProvider>
         <View style = {styles.container} >
+            <Portal>
+                <Modal 
+                    visible={visible} 
+                    onDismiss={modalChange} 
+                    contentContainerStyle={containerStyle}>
+                    {/* <Text>Example Modal.  Click outside this area to dismiss.</Text>
+                    <FormRegister
+                        titleInput = {'Email'}
+                        palceHolder="raphael.sanchez@estacio.br"
+                    /> */}
+                    <Button
+                        onPress={() => setDataPickerDay(true)}
+                    >Selecionar dia</Button>
+                    {dataPickerDay ? (<DatePicker 
+                        style={{
+                            width: "100%"
+                        }}
+                        value={date}
+                        mode="date"
+                        is24Hour={true}
+                        onChange={onChangeDate}
+                    />) : null}
+                    <Button
+                        onPress={() => setDataPickerDay2(true)}
+                    >Selecionar hora</Button>
+                    {dataPickerDay2 ? (<DatePicker 
+                        style={{
+                            width: "100%"
+                        }}
+                        value={date}
+                        mode="time"
+                        is24Hour={true}
+                        onChange={onChangeDate}
+                    />) : null}
+                    <Text>{date.toLocaleString('pt-BR')}</Text>
+                    <Menu
+                        visible={visibleMenu}
+                        onDismiss={changeMenu}
+                        anchor={<Button onPress={changeMenu}>Show menu</Button>}
+                    >
+                        {clientesBuscados ? [clientes[0] ? clientes.map((elem) => {
+                            <Menu.Item title={elem.nome} />
+                        }): <View style={{display: "flex", alignItems: "center", justifyContent: "center", marginTop: 300}}><Text style={{fontSize: 30}} >SEM CLIENTES</Text></View>] : null}
+                        <Menu.Item onPress={() => {}} title="Item 2" />
+                        <Menu.Item onPress={() => {}} title="Item 3" />
+                    </Menu>
+                </Modal>
+            </Portal>
+
             <ScrollView>
-            <Searchbar
-                placeholder="Pesquisar"
-                onChangeText={setSearchQuery}
-                value={searchQuery}
-                theme={{ colors: { primary: 'white', secundary: 'green' } }}
-            />
-            {notasFiscaisBuscadas ? [notasFiscais[0] ? notasFiscais.map((elem) => (
+                
+            <View style={{flexDirection:"row"}}>
+                <FAB
+                    label="+"
+                    style={{backgroundColor:"#000",flex:1}}
+                    color={"#FFF"}
+                    uppercase={true}
+                    onPress={() => modalChange()}
+                />
+                <Searchbar
+                    style={{flex:4}}
+                    placeholder="Pesquisar"
+                    onChangeText={setSearchQuery}
+                    value={searchQuery}
+                    theme={{ colors: { primary: 'white', secundary: 'green' } }}
+                />
+            </View>
+            {/* {notasFiscaisBuscadas ? [notasFiscais[0] ? notasFiscais.map((elem) => (
                <TouchableRipple style={{
                     borderColor: "#000", 
                     borderWidth: 0.8, 
@@ -110,19 +207,10 @@ export default function Home({ onClose = () => {} }) {
                         )}/>
                     
                     </List.Accordion>
-                </TouchableRipple>)) : <View style={{display: "flex", alignItems: "center", justifyContent: "center", marginTop: 300}}><Text style={{fontSize: 30}} >SEM AGENDAMENTOS</Text></View>] : <ActivityIndicator color="#5ED9FC" size={100} style={styles.loading} animating={true} />}
+                </TouchableRipple>)) : <View style={{display: "flex", alignItems: "center", justifyContent: "center", marginTop: 300}}><Text style={{fontSize: 30}} >SEM AGENDAMENTOS</Text></View>] : <ActivityIndicator color="#5ED9FC" size={100} style={styles.loading} animating={true} />} */}
 
             </ScrollView>
-            <Dialog visible={visible} onDismiss={hideDialog}>
-                    <Dialog.Title>Deletar</Dialog.Title>
-                    <Dialog.Content>
-                    {/* <Text>Deseja deletar os dados do(a) cliente {nomeNotaFiscalDeletada} ?</Text> */}
-                    </Dialog.Content>
-                    <Dialog.Actions>
-                    <Button onPress={hideDialog} textColor="blue">Cancelar</Button>
-                    {/* <Button onPress={deletadorNotaFiscal} textColor="red">Deletar</Button> */}
-                    </Dialog.Actions>
-            </Dialog>
+            
         </View>
     </PaperProvider>
 
