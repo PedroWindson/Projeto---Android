@@ -11,7 +11,7 @@ import ListaDeClientes from "../pages/listaDeClientes/ListaDeClientes";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { faFile, faFileCircleCheck, faFileCirclePlus, faUserPlus, faHome } from "@fortawesome/free-solid-svg-icons";
-import { CommonActions, useNavigation } from '@react-navigation/native'
+import { useNavigation } from '@react-navigation/native'
 
 
 library.add(faFileCirclePlus, faFileCircleCheck, faUserPlus, faHome)
@@ -21,9 +21,6 @@ const Tab = createBottomTabNavigator();
 export default function TabRoutes() {
 
     const navigation = useNavigation()
-
-    const [atualizaNFE, setAtualizaNFE] = useState()
-    const [atualizaCliente, setAtualizaCliente] = useState()
 
     useEffect(() => {
         const backAction = () => {
@@ -46,20 +43,10 @@ export default function TabRoutes() {
         return () => backHandler.remove();
     }, []);
 
-    // const chamaEditorDeNFE = (e) => {
-    //     navigation.navigate('register-nfe', {dados: e})
-
-    // }
     const chamaEditorDeFichaDeAnamnese = (e) => {
         navigation.navigate('fichaDeAnamnese', {dados: e})
 
     }
-    // const enviaParaNotasNotConclued = () => {
-    //     navigation.navigate('home')
-    // }
-    // const enviaParaNotasConclued = () => {
-    //     navigation.navigate('concluded')
-    // }
     const salvaAlteracaoFichaDeAnamnese = () => {
         navigation.navigate('listaDeClientes')
     }
@@ -165,48 +152,6 @@ export default function TabRoutes() {
                     )
                 }}
             />
-
-            {/* <Tab.Screen
-                name = 'register-client'
-                component ={() => <RegisterClient onClose={() => {
-                        enviaClientes()
-                }}/>}
-                options = {{
-                    headerTitle: 'CADASTRO CLIENTE',
-                    tabBarIcon: ({ size, color, focused }) => (
-                            (focused)?
-                            (
-                                <View style = {styles.containerFocusIcon}>
-                                    <View style = {styles.focusIcon} />
-                                    <FontAwesome5 name = 'user-plus' size = {size + 7} color = {'#2BCDF9'} />
-                                </View>
-                            )
-                            :
-                            <FontAwesome5 name = 'user-plus' size = {size} color = {'#FFF'} />
-                        )
-                    }}
-            />
-
-            <Tab.Screen
-                name = 'clients'
-                component ={() => <Clients onClose={(e) => {
-                    if(e){chamaEditorDeClient(e)}
-                }}/>}
-                options = {{
-                    headerTitle: 'CLIENTES',
-                    tabBarIcon: ({ size, color, focused }) => (
-                        (focused)?
-                        (
-                            <View style = {styles.containerFocusIcon}>
-                                <View style = {styles.focusIcon} />
-                                <FontAwesome5 name = 'user-alt' size = {size + 7} color = {'#2BCDF9'} />
-                            </View>
-                        )
-                        :
-                        <FontAwesome5 name = 'user-alt' size = {size} color = {'#FFF'} />
-                    )
-                }}
-            /> */}
 
         </Tab.Navigator>
         
