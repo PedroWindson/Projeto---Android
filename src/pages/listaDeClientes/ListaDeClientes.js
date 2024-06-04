@@ -82,9 +82,9 @@ export default function ListaDeClientes({ onClose = () => {} }) {
                         borderRadius: 50,
                         alignItems: "center",
                         justifyContent: 'center',  
-                        backgroundColor: "#5ED9FC" 
+                        backgroundColor: "rgba(0,0,0,0)" 
                     }}>
-                            <FontAwesomeIcon icon={faUser} size={30}/>
+                            <FontAwesomeIcon color="#e6ddab" icon={faUser} size={30}/>
                         </View>}
                     >
                         <List.Item title={elem.email} right={props =>(<>
@@ -106,7 +106,7 @@ export default function ListaDeClientes({ onClose = () => {} }) {
                         <List.Item title={`É Gestante? ${elem.gestante}`}/>
                     
                     </List.Accordion>
-                </TouchableRipple>)) : <View style={{display: "flex", alignItems: "center", justifyContent: "center", marginTop: 300}}><Text style={{fontSize: 30}} >SEM CLIENTES</Text></View>] : <ActivityIndicator color="#5ED9FC" size={100} style={styles.loading} animating={true} />}
+                </TouchableRipple>)) : <View style={{display: "flex", alignItems: "center", justifyContent: "center", marginTop: 300}}><Text style={{fontSize: 30}} >SEM CLIENTES</Text></View>] : <ActivityIndicator color="#9e967e" size={100} style={styles.loading} animating={true} />}
 
             </ScrollView>
             <Dialog visible={visible} onDismiss={hideDialog}>

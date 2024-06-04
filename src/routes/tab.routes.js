@@ -84,14 +84,14 @@ export default function TabRoutes() {
                 headerStyle: {
                     borderWidth: 0,
                     elevation: 0,
-                    backgroundColor: '#1A3D73',
+                    backgroundColor: '#e6ddab',
                 },
 
                 tabBarStyle: {
                     height: 55,
                     borderWidth: 0,
                     elevation: 0,
-                    backgroundColor: '#0F4C82',
+                    backgroundColor: '#e6ddab',
                 }
             }}>
 
@@ -108,7 +108,7 @@ export default function TabRoutes() {
                         (
                             <View style = {styles.containerFocusIcon}>
                                 <View style = {styles.focusIcon} />
-                                <FontAwesomeIcon icon={faUserPlus} size = {size + 7} color = {'#2BCDF9'} />
+                                <FontAwesomeIcon icon={faUserPlus} size = {size + 7} color = {'#9e967e'} />
                             </View>
                         )
                         :
@@ -134,7 +134,7 @@ export default function TabRoutes() {
                         (
                             <View style = {styles.containerFocusIcon}>
                                 <View style = {styles.focusIcon} />
-                                <FontAwesomeIcon icon={faHome} size = {size + 7} color = {'#2BCDF9'} />
+                                <FontAwesomeIcon icon={faHome} size = {size + 7} color = {'#9e967e'} />
                             </View>
                         )
                         :
@@ -157,7 +157,7 @@ export default function TabRoutes() {
                         (
                             <View style = {styles.containerFocusIcon}>
                                 <View style = {styles.focusIcon} />
-                                <FontAwesomeIcon icon={faFile} size = {size + 7} color = {'#2BCDF9'} />
+                                <FontAwesomeIcon icon={faFile} size = {size + 7} color = {'#9e967e'} />
                             </View>
                         )
                         :
@@ -224,6 +224,6 @@ const styles = StyleSheet.create({
         width: 80,
         bottom: 9,
         borderRadius: 3,
-        backgroundColor: '#2BCDF9'
+        backgroundColor: '#9e967e'
     }
 });

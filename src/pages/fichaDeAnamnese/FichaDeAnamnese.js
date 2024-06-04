@@ -545,20 +545,20 @@ const styles = StyleSheet.create({
         width: '20%',
         marginHorizontal: 10,
         borderRadius: 10,
-        backgroundColor: '#000',
+        backgroundColor: '#9e967e',
     },
     espacoEntrePartes: {
         height: 2,
         width: '100%',
         marginVertical: 20,
         borderRadius: 10,
-        backgroundColor: 'black',
+        backgroundColor: '#9e967e',
     },
 
     titleText: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: '#000',
+        color: '#9e967e',
     },
     loading: {
         display: "flex",

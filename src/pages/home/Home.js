@@ -10,6 +10,7 @@ import { height, width } from "@fortawesome/free-brands-svg-icons/fa42Group";
 import { FormRegister } from "../../components/FormRegister";
 import DatePicker from "@react-native-community/datetimepicker";
 import Cliente from "../../services/sqlite/Cliente";
+import Agendamentos from "../../services/sqlite/Agendamentos";
 
 
 export default function Home({ onClose = () => {} }) {
@@ -25,17 +26,6 @@ export default function Home({ onClose = () => {} }) {
     const showDialog = () => setVisible(true);
   
     const hideDialog = () => setVisible(false);
-
-    useEffect(() => {
-        buscaAgendamentos()
-    }, [])
-
-    const buscaAgendamentos = async () => {
-        // await NotaFiscal.findByNotConcluded()
-        // .then(notas => setNotasFiscais(notas))
-        // setNotasFiscaisBuscadas(true)
-        // console.log(notasFiscais)
-    }
 
     const deletaNotaFiscal = (nota) => {
         setVisible(!visible)
@@ -56,8 +46,13 @@ export default function Home({ onClose = () => {} }) {
     const [searchQuery, setSearchQuery] = React.useState('');
 
 
-    const modalChange = () => setVisible(!visible);
-    const containerStyle = {backgroundColor: 'white', marginHorizontal: "10%", width: "80%", height:"80%", borderRadius: 10};
+    const modalChange = () => {
+        setVisible(!visible)
+        setClienteSelecionado(null)
+        setDate(new Date)
+    };
+
+    const containerStyle = {backgroundColor: '#f8f8f8', marginHorizontal: "10%", width: "80%", height:"80%", borderRadius: 10};
 
     const [date, setDate] = useState(new Date())
     const [openDate, setOpenDate] = useState()
@@ -74,9 +69,19 @@ export default function Home({ onClose = () => {} }) {
     const [clientes, setClientes] = useState()
     const [clientesBuscados, setClientesBuscados] = useState(false)
 
+    const [agendamentos, setAgendamentos] = useState()
+    const [agendamentosBuscados, setAgendamentosBuscados] = useState(false)
+
     useEffect(() => {
         buscaClientes()
+        buscaAgendamentos()
     }, [])
+
+    const buscaAgendamentos = async () => {
+        const busca = await Agendamentos.all();
+        setAgendamentos(busca);
+        setAgendamentosBuscados(true);
+    }
 
     const buscaClientes = async () => {
         const busca = await Cliente.all();
@@ -87,6 +92,43 @@ export default function Home({ onClose = () => {} }) {
     const [visibleMenu, setVisibleMenu] = useState()
 
     const changeMenu = () => {setVisibleMenu(!visibleMenu)}
+
+    const [clienteSelecionado, setClienteSelecionado] = useState()
+
+    const geraAgendamento = async () => {
+        let dataTime = date.toISOString()
+        await Agendamentos.create({cliente:clienteSelecionado,dataTime:`${dataTime.toString()}`})
+        .then(() => {
+            console.log("criado")
+            modalChange()
+            buscaAgendamentos()
+        } )
+        .catch( err => {
+            console.log(err)
+        })
+    }
+
+    const deletaAgendamento = async (elem) => {
+        await Agendamentos.remove(elem.id)
+        buscaAgendamentos()
+    }
+
+    const editAgendamento = async (elem) => {
+        setClienteSelecionado(elem.cliente)
+        setDate(elem.dataTime)
+        modalChange()
+    }
+
+    const handleSearch = async (elem) => {
+        setSearchQuery(elem)
+        agendamentos.map((agen) => {
+            if(agen.cliente.match(elem)){
+                console.log(agen.cliente)
+            }else if(!agen.cliente.match(elem)){
+                console.log("Sem cliente compativel")
+            }
+        })
+    }
 
     return(
 
@@ -111,7 +153,6 @@ export default function Home({ onClose = () => {} }) {
                         }}
                         value={date}
                         mode="date"
-                        is24Hour={true}
                         onChange={onChangeDate}
                     />) : null}
                     <Button
@@ -132,33 +173,91 @@ export default function Home({ onClose = () => {} }) {
                         onDismiss={changeMenu}
                         anchor={<Button onPress={changeMenu}>Show menu</Button>}
                     >
-                        {clientesBuscados ? [clientes[0] ? clientes.map((elem) => {
-                            <Menu.Item title={elem.nome} />
-                        }): <View style={{display: "flex", alignItems: "center", justifyContent: "center", marginTop: 300}}><Text style={{fontSize: 30}} >SEM CLIENTES</Text></View>] : null}
-                        <Menu.Item onPress={() => {}} title="Item 2" />
-                        <Menu.Item onPress={() => {}} title="Item 3" />
+                        {clientesBuscados ? [clientes[0] ? clientes.map((elem) => (
+                            <Menu.Item onPress={() => {
+                                setClienteSelecionado(elem.nome)
+                                changeMenu()
+                            }} title={elem.nome} />
+                        )) : null] : <Menu.Item title="CLIENTES NÃO ENCONTRADOS" disabled/>}
                     </Menu>
+                    <Text>{clienteSelecionado ? clienteSelecionado : "SEM CLIENTE SELECIONADO"}</Text>
+                    <Button
+                        onPress={geraAgendamento}
+                    >Agendar</Button>
                 </Modal>
             </Portal>
 
             <ScrollView>
                 
-            <View style={{flexDirection:"row"}}>
+            <View style={{flexDirection:"row", marginHorizontal:10, marginVertical: 5}}>
                 <FAB
-                    label="+"
-                    style={{backgroundColor:"#000",flex:1}}
+                    label="Criar"
+                    style={{backgroundColor:"#e6ddab",flex:1.4, borderRadius:10, marginRight:5}}
                     color={"#FFF"}
                     uppercase={true}
                     onPress={() => modalChange()}
                 />
                 <Searchbar
-                    style={{flex:4}}
+                    style={{flex:4,backgroundColor: '#f8f8f8', borderWidth: 1, borderRadius: 10}}
                     placeholder="Pesquisar"
-                    onChangeText={setSearchQuery}
+                    onChangeText={(elem) => handleSearch(elem)}
                     value={searchQuery}
-                    theme={{ colors: { primary: 'white', secundary: 'green' } }}
                 />
             </View>
+            {agendamentosBuscados ? [agendamentos[0] ? agendamentos.map((elem) => (
+                <TouchableRipple style={{
+                    borderColor: "#000",
+                    borderWidth: 0.8, 
+                    margin: 5,
+                    borderRadius: 5,
+                }}
+                >
+                    <List.Accordion
+                    titleStyle={{
+                        fontSize: 20, 
+                        color: "#000",
+                        whiteSpace: "nowrap", 
+                        textOverflow: "ellipsis", 
+                        width: "98%", 
+                        display: "block", 
+                        overflow: "hidden"
+                    }}
+                    descriptionStyle={{
+                        fontSize: 20, 
+                        color: "#000",
+                        whiteSpace: "nowrap", 
+                        textOverflow: "ellipsis", 
+                        width: "98%", 
+                        display: "block", 
+                        overflow: "hidden"
+                    }}
+                    style={{backgroundColor:"#f8f8f8"}}
+                    descriptionNumberOfLines={1}
+                    description={`Dia: ${elem.dataTime}`}
+                    title={`Cliente: ${elem.cliente}`}
+                    right={props => <View style = {{        
+                        height: 50,
+                        width: 50,
+                        borderRadius: 50,
+                        alignItems: "center",
+                        justifyContent: 'center',  
+                        backgroundColor: "rgba(0,0,0,0)" 
+                    }}>
+                            <FontAwesomeIcon 
+                                icon={faClock} 
+                                size={30}
+                                style={{color:"#e6ddab"}}
+                            />
+                        </View>}
+                    >
+                        <List.Item title={elem.dataTime} right={props =>(<>
+                        <List.Item title={<FontAwesomeIcon icon={faPen} color="#9e967e"/>} onPress={() => {editAgendamento(elem)}}/>
+                        <List.Item title={<FontAwesomeIcon icon={faTrash} color="#9e967e"/>} onPress={() => {deletaAgendamento(elem)}}/>
+                        </>
+                        )}/>
+                    
+                    </List.Accordion>
+                </TouchableRipple>)) : <Text>SEM AGENDAMENTOS</Text>] : <ActivityIndicator color="#9e967e" size={100} style={styles.loading} animating={true} />}
             {/* {notasFiscaisBuscadas ? [notasFiscais[0] ? notasFiscais.map((elem) => (
                <TouchableRipple style={{
                     borderColor: "#000", 
@@ -207,7 +306,7 @@ export default function Home({ onClose = () => {} }) {
                         )}/>
                     
                     </List.Accordion>
-                </TouchableRipple>)) : <View style={{display: "flex", alignItems: "center", justifyContent: "center", marginTop: 300}}><Text style={{fontSize: 30}} >SEM AGENDAMENTOS</Text></View>] : <ActivityIndicator color="#5ED9FC" size={100} style={styles.loading} animating={true} />} */}
+                </TouchableRipple>)) : <View style={{display: "flex", alignItems: "center", justifyContent: "center", marginTop: 300}}><Text style={{fontSize: 30}} >SEM AGENDAMENTOS</Text></View>] : <ActivityIndicator color="#9e967e" size={100} style={styles.loading} animating={true} />} */}
 
             </ScrollView>
             
@@ -221,7 +320,7 @@ export default function Home({ onClose = () => {} }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#FFF',
+        backgroundColor: '#f8f8f8',
     },
     loading: {
         display: "flex",
