@@ -88,8 +88,8 @@ export default function ListaDeClientes({ onClose = () => {} }) {
                         </View>}
                     >
                         <List.Item title={elem.email} right={props =>(<>
-                        <List.Item title={<FontAwesomeIcon icon={faPen} color="#5ED9FC"/>} onPress={() => onClose(elem)}/>
-                        <List.Item title={<FontAwesomeIcon icon={faTrash} color="red"/>} onPress={() => {deletaCliente(elem)}}/>
+                        <List.Item title={<FontAwesomeIcon icon={faPen} color="#9e967e"/>} onPress={() => onClose(elem)}/>
+                        <List.Item title={<FontAwesomeIcon icon={faTrash} color="#9e967e"/>} onPress={() => {deletaCliente(elem)}}/>
                         </>
                         )}/>
                         <List.Item title={elem.endereco}/>
