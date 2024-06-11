@@ -1,2 +1,2 @@
 # Projeto-Android
-Projeto Andorid em Java
+Projeto Andorid em JavaScript
